@@ -27,6 +27,9 @@ class Config:
             setattr(self, key.lower(), value)
 
         self.valid_retrievers = config_to_use['VALID_RETRIEVERS']
+
+        self.llm_provider = config_to_use['LLM_PROVIDER']
+
         try:
             self.retrievers = self.parse_retrievers(config_to_use['RETRIEVER'])
         except ValueError as e:
