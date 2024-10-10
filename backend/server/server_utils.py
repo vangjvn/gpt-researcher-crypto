@@ -24,7 +24,9 @@ async def handle_start_command(websocket, data: str, manager):
     if not task or not report_type:
         print("Error: Missing task or report_type")
         return
-    task = "crypto, " + task
+
+    # task = "Search in the crypto field: " + task
+
     sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{task}")
 
     report = await manager.start_streaming(
@@ -42,10 +44,11 @@ async def handle_human_feedback(data: str):
 
 
 async def generate_report_files(report: str, filename: str) -> Dict[str, str]:
-    pdf_path = await write_md_to_pdf(report, filename)
+    # pdf_path = await write_md_to_pdf(report, filename)
     docx_path = await write_md_to_word(report, filename)
     md_path = await write_text_to_md(report, filename)
-    return {"pdf": pdf_path, "docx": docx_path, "md": md_path}
+    return {"pdf": "", "docx": docx_path, "md": md_path}
+    # return {"docx": docx_path, "md": md_path}
 
 
 async def send_file_paths(websocket, file_paths: Dict[str, str]):

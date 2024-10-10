@@ -8,8 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
+from backend.report_type import BasicReport, DetailedReport
+from gpt_researcher.utils.enum import ReportType
 
-from backend.server.server_utils import generate_report_files
 from gpt_researcher.utils.enum import Dict_tone
 from backend.server.websocket_manager import WebSocketManager
 from multi_agents.main import run_research_task
@@ -153,15 +154,45 @@ async def research_endpoint(request: Request):
         sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{query}")
         tone = data.get("tone", "Objective").lower()
         tone = Dict_tone[tone]
+
+        report_type = data.get("report_type", "research_report").lower()
+
         # 执行研究任务
-        report = await run_research_task(
-            query=query,
-            tone=tone
-        )
+        if report_type == "multi_agents": # multi_agents 任务 通过多个agent进行研究, 生成综合报告
+            report = await run_research_task(
+                query=query,
+                tone=tone
+            )
+        elif report_type == "detailed_report": # detailed_report 任务 通过单个agent进行研究, 生成详细报告
+            researcher = DetailedReport(
+                query=query,
+                report_type=ReportType.DetailedReport.value,
+                report_source="web",
+                source_urls=[],
+                tone=tone,
+                config_path="",
+                websocket=None,
+                headers={}
+            )
+            report = await researcher.run()
+        else: # basic_report 任务 通过单个agent进行研究, 生成基础报告
+            researcher = BasicReport(
+                query=query,
+                report_type=report_type,
+                report_source="web",
+                source_urls=[],
+                tone=tone,
+                config_path="",
+                websocket=None,
+                headers={}
+            )
+            report = await researcher.run()
 
         # 生成报告文件
         file_paths = await generate_report_files(str(report), sanitized_filename)
-
+        new_file_paths = {}
+        new_file_paths["docx"] = file_paths["docx"]
+        new_file_paths["md"] = file_paths["md"]
         # 准备响应
         response = {
             "report": str(report),
