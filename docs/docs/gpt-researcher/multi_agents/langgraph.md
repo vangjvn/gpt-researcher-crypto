@@ -59,7 +59,7 @@ More specifically (as seen in the architecture diagram) the process is as follow
    ```
 2. Run the application:
     ```bash
-    python main.py
+    python research_main.py
     ```
 
 ## Usage
