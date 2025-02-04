@@ -7,6 +7,151 @@ import requests
 import json
 
 
+from dataclasses import dataclass, field
+from dotenv import load_dotenv
+from typing import Dict, Any, List, Optional, Deque
+from datetime import datetime, timedelta
+from collections import deque
+import threading
+import os
+from pydantic_settings import BaseSettings  # 更改这里
+from pydantic import BaseModel, Field, ConfigDict
+
+
+
+load_dotenv()
+
+
+@dataclass
+class APIKeyStatus:
+    """API Key的状态信息"""
+    key: str
+    last_used: datetime = field(default_factory=datetime.now)
+    request_count: int = 0
+    is_available: bool = True
+    error_count: int = 0
+    last_error_time: Optional[datetime] = None
+
+class RateLimit:
+    """速率限制配置"""
+    def __init__(self,
+                 requests_per_second: float,
+                 burst_limit: Optional[int] = None,
+                 daily_limit: Optional[int] = None):
+        self.requests_per_second = requests_per_second  # 每秒请求数
+        self.min_interval = 1.0 / requests_per_second  # 最小请求间隔
+        self.burst_limit = burst_limit  # 突发请求限制
+        self.daily_limit = daily_limit  # 每日请求限制
+
+
+class APIKeyPool:
+    """API Key池管理器"""
+
+    def __init__(self,
+                 keys: str,
+                 rate_limit: RateLimit):
+        self.keys: Deque[APIKeyStatus] = deque(
+            [APIKeyStatus(key=k) for k in keys.split(",") if k.strip()]
+        )
+        self.rate_limit = rate_limit
+        self.lock = threading.Lock()
+        self.last_reset = datetime.now()
+        self._daily_count = 0
+
+    def get_next_key(self) -> Optional[str]:
+        """获取下一个可用的API Key"""
+        with self.lock:
+            if not self.keys:
+                return None
+
+            current_time = datetime.now()
+
+            # 重置每日计数
+            if (current_time - self.last_reset).days >= 1:
+                self._daily_count = 0
+                self.last_reset = current_time
+
+            # 检查每日限制
+            if (self.rate_limit.daily_limit and
+                    self._daily_count >= self.rate_limit.daily_limit):
+                return None
+
+            # 尝试找到一个可用的key
+            attempts = len(self.keys)
+            while attempts > 0:
+                key_status = self.keys[0]
+
+                # 检查这个key是否可用
+                time_since_last_use = (current_time - key_status.last_used).total_seconds()
+                if (time_since_last_use >= self.rate_limit.min_interval and
+                        key_status.is_available):
+                    key_status.last_used = current_time
+                    key_status.request_count += 1
+                    self._daily_count += 1
+
+                    # 将使用过的key放到队列末尾
+                    self.keys.rotate(-1)
+                    return key_status.key
+
+                # 如果当前key不可用，轮转到下一个
+                self.keys.rotate(-1)
+                attempts -= 1
+
+            return None
+
+
+class APIKeyManager:
+    """API Key管理器"""
+
+    def __init__(self):
+        self.pools: Dict[str, APIKeyPool] = {}
+
+    def initialize_pool(self,
+                        pool_name: str,
+                        keys: str,
+                        rate_limit: RateLimit):
+        """初始化特定的API Key池"""
+        self.pools[pool_name] = APIKeyPool(keys, rate_limit)
+
+    def get_next_key(self, pool_name: str) -> Optional[str]:
+        """从指定的池中获取下一个可用的key"""
+        if pool_name in self.pools:
+            return self.pools[pool_name].get_next_key()
+        return None
+
+class Settings(BaseSettings):
+    # API Key管理器
+    api_key_manager: APIKeyManager = Field(default_factory=APIKeyManager)
+
+    TAVILY_API_KEYS: str = os.getenv("TAVILY_API_KEYS","")
+
+
+    def __init__(self, **data: Any):
+        super().__init__(**data)
+        self._initialize_api_key_pools()
+
+    def _initialize_api_key_pools(self):
+        """初始化所有API Key池"""
+        # 从环境变量读取多个API key
+
+        print("开始初始化api key池")
+        self.api_key_manager.initialize_pool(
+            "tavily",
+            self.TAVILY_API_KEYS,
+            RateLimit(
+                requests_per_second=10.0,  # OpenAI的限制是每秒80次
+                daily_limit=1000  # 示例每日限制
+            )
+        )
+
+    def get_tavily_api_key(self) -> Optional[str]:
+        """获取下一个可用的tavily API Key"""
+        return self.api_key_manager.get_next_key("tavily")
+
+settings = Settings()
+
+
+
 class TavilySearch():
     """
     Tavily API Retriever
@@ -36,7 +181,8 @@ class TavilySearch():
         api_key = self.headers.get("tavily_api_key")
         if not api_key:
             try:
-                api_key = os.environ["TAVILY_API_KEY"]
+                api_key = settings.get_tavily_api_key()
+
             except KeyError:
                 raise Exception(
                     "Tavily API key not found. Please set the TAVILY_API_KEY environment variable.")

@@ -29,7 +29,7 @@ unstructured
 json_repair
 json5
 loguru
-
+pydantic_settings
 # uncomment for testing
 # pytest
 # pytest-asyncio
