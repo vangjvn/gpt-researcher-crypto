@@ -1,3 +1,4 @@
+import hashlib
 import json
 import os
 import re
@@ -15,6 +16,14 @@ from backend.utils import write_md_to_pdf, write_md_to_word, write_text_to_md
 def sanitize_filename(filename: str) -> str:
     return re.sub(r"[^\w\s-]", "", filename).strip()
 
+def create_filename(query: str) -> str:
+    """
+    创建简单的文件名：task_时间戳_查询内容hash
+    """
+    # 生成query的md5 hash（取前8位）
+    query_hash = hashlib.md5(query.encode('utf-8')).hexdigest()[:8]
+    # 组合文件名
+    return f"task_{int(time.time())}_{query_hash}"
 
 async def handle_start_command(websocket, data: str, manager):
     json_data = json.loads(data[6:])

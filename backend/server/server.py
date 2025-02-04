@@ -17,7 +17,7 @@ from multi_agents.main import run_research_task
 from gpt_researcher.document.document import DocumentLoader
 from gpt_researcher.orchestrator.actions import stream_output
 from backend.server.server_utils import (
-    sanitize_filename, handle_start_command, handle_human_feedback,
+    sanitize_filename, create_filename, handle_start_command, handle_human_feedback,
     generate_report_files, send_file_paths, get_config_dict,
     update_environment_variables, handle_file_upload, handle_file_deletion,
     execute_multi_agents, handle_websocket_communication, extract_command_data
@@ -152,6 +152,7 @@ async def research_endpoint(request: Request):
         data = await request.json()
         query = f"{data.get("task")}"
         sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{query}")
+        sanitized_filename = create_filename(query)
         tone = data.get("tone", "Objective").lower()
         tone = Dict_tone[tone]
 
