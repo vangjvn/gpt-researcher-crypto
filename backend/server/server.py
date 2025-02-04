@@ -186,7 +186,7 @@ async def research_endpoint(request: Request):
                 query=query,
                 report_type=report_type,
                 report_source="web",
-                source_urls=[],
+                source_urls=source_urls,
                 tone=tone,
                 config_path="",
                 websocket=None,
