@@ -157,7 +157,7 @@ async def research_endpoint(request: Request):
 
         report_type = data.get("report_type", "research_report").lower()
 
-        source_urls = ["https://cn.investing.com/crypto","https://mifengcha.com/"]
+        source_urls = ["https://cn.investing.com/crypto","https://mifengcha.com/","alternative.me/crypto/fear-and-greed-index/","coindesk.com","cointelegraph.com","reddit.com/r/CryptoCurrency"]
 
         # 默认research_report。1分钟左右，detailed_report：3分钟左右。multi_agents：5分钟左右。
         # 执行研究任务
