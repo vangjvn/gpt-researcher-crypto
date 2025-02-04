@@ -150,7 +150,7 @@ async def research_endpoint(request: Request):
     try:
         # 准备参数
         data = await request.json()
-        query = f"crypto: {data.get("task")}"
+        query = f"{data.get("task")}"
         sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{query}")
         tone = data.get("tone", "Objective").lower()
         tone = Dict_tone[tone]
