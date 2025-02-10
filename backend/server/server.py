@@ -151,15 +151,15 @@ async def research_endpoint(request: Request):
         # 准备参数
         data = await request.json()
         query = f"{data.get("task")}"
-        sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{query}")
+        # sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{query}")
         sanitized_filename = create_filename(query)
         tone = data.get("tone", "Objective").lower()
         tone = Dict_tone[tone]
 
         report_type = data.get("report_type", "research_report").lower()
 
-        source_urls = ["https://cn.investing.com/crypto","https://mifengcha.com/","alternative.me/crypto/fear-and-greed-index/","coindesk.com","cointelegraph.com","reddit.com/r/CryptoCurrency"]
-
+        # source_urls = ["https://cn.investing.com/crypto","https://mifengcha.com/","alternative.me/crypto/fear-and-greed-index/","coindesk.com","cointelegraph.com","reddit.com/r/CryptoCurrency"]
+        source_urls = []
         # 默认research_report。1分钟左右，detailed_report：3分钟左右。multi_agents：5分钟左右。
         # 执行研究任务
         if report_type == "multi_agents": # multi_agents 任务 通过多个agent进行研究, 生成综合报告，返回报告内容和文件路径，耗时5分钟左右
