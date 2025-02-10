@@ -238,7 +238,7 @@ async def generate_report(
                 {"role": "system", "content": f"{agent_role_prompt}"},
                 {"role": "user", "content": content},
             ],
-            temperature=0.35,
+            temperature=0.5,
             llm_provider=cfg.llm_provider,
             stream=True,
             websocket=websocket,
