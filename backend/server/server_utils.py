@@ -25,6 +25,7 @@ def create_filename(query: str) -> str:
     # 组合文件名
     return f"task_{int(time.time())}_{query_hash}"
 
+
 async def handle_start_command(websocket, data: str, manager):
     json_data = json.loads(data[6:])
     task, report_type, source_urls, tone, headers, report_source = extract_command_data(
@@ -36,8 +37,8 @@ async def handle_start_command(websocket, data: str, manager):
 
     # task = "Search in the crypto field: " + task
 
-    sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{task}")
-
+    # sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{task}")
+    sanitized_filename = create_filename(task)
     report = await manager.start_streaming(
         task, report_type, report_source, source_urls, tone, websocket, headers
     )
