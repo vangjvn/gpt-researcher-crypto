@@ -35,7 +35,9 @@ async def handle_start_command(websocket, data: str, manager):
         print("Error: Missing task or report_type")
         return
 
-    # task = "Search in the crypto field: " + task
+    task = f"""
+    {task}
+    """
 
     # sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{task}")
     sanitized_filename = create_filename(task)

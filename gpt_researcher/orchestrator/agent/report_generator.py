@@ -40,7 +40,9 @@ class ReportGenerator:
             )
 
         report_params = {
-            "query": self.researcher.query,
+            "query": f"""# 任务：{self.researcher.query}
+语言要求：识别任务所使用的语言，并用该语言完成任务报告。
+            """,
             "context": context,
             "agent_role_prompt": self.researcher.cfg.agent_role or self.researcher.role,
             "report_type": self.researcher.report_type,

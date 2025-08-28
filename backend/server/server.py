@@ -150,7 +150,13 @@ async def research_endpoint(request: Request):
     try:
         # 准备参数
         data = await request.json()
-        query = f"{data.get("task")}"
+        # query = f"""
+        # 任务：
+        # {data.get("task")}
+        # 要求：
+        # 识别任务中的语言，并用对应语言生成报告。
+        # """
+        query = data.get("task")
         # sanitized_filename = sanitize_filename(f"task_{int(time.time())}_{query}")
         sanitized_filename = create_filename(query)
         tone = data.get("tone", "Objective").lower()
