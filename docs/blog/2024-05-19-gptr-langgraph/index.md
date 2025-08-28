@@ -200,7 +200,7 @@ After finalizing the agents, states and graphs, it’s time to run our research 
   "guidelines": [
     "The report MUST be written in APA format",
     "Each sub section MUST include supporting sources using hyperlinks. If none exist, erase the sub section or rewrite it to be a part of the previous section",
-    "The report MUST be written in spanish"
+    "识别当前任务所用语言，报告必须跟随当前任务所用的语言"
   ]
 }
 ```

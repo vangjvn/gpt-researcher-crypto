@@ -8,7 +8,7 @@ chief_editor = ChiefEditorAgent({
   "guidelines": [
     "The report MUST be written in APA format",
     "Each sub section MUST include supporting sources using hyperlinks. If none exist, erase the sub section or rewrite it to be a part of the previous section",
-    "The report MUST be written in english"
+    "识别当前任务所用语言，报告必须跟随当前任务所用的语言"
   ],
   "verbose": False
 }, websocket=None, stream_output=None)

@@ -14,7 +14,7 @@ export const task = {
     "guidelines": [
       "The report MUST fully answer the original question",
       "The report MUST be written in apa format",
-      "The report MUST be written in english"
+      "识别当前任务所用语言，报告必须跟随当前任务所用的语言"
     ],
     "verbose": true
   },

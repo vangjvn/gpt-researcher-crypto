@@ -8,11 +8,11 @@
   },
   "include_human_feedback": false,
   "follow_guidelines": false,
-  "model": "gpt-4o-mini",
+  "model": "gpt-5",
   "guidelines": [
     "The report MUST be written in APA format",
     "Each sub section MUST include supporting sources using hyperlinks. If none exist, erase the sub section or rewrite it to be a part of the previous section",
-    "The report MUST be written in english"
+    "识别当前任务所用的语言，报告必须根据任务的语言来编写"
   ],
   "verbose": true
 }
