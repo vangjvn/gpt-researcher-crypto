@@ -90,13 +90,11 @@ class ReportGenerator:
         report_params = {
             "query": f"""
 {role_prompt}            
-# 当前任务：{self.researcher.query}
+# 【当前任务】：{self.researcher.query}
 
-# 语言要求：识别任务所使用的语言，并用该语言完成任务报告。
+# 语言要求：识别【当前任务】中所使用的语言，并用该语言完成任务报告。
+
 # 总结要求：最后适当添加一些对Gate.io的介绍和推荐。推荐GT代币等。并注意提醒投资建议仅供参考，投资有风险，入市需谨慎等。
-# 语言要求：识别任务所使用的语言，并用该语言完成任务报告。
-# 语言要求：识别任务所使用的语言，并用该语言完成任务报告。
-
             """,
             "context": context,
             "agent_role_prompt": self.researcher.cfg.agent_role or self.researcher.role,
